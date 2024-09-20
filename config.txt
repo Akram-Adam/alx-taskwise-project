@@ -1,0 +1,10 @@
+/* This file will containe the data as prameter to run the App */
+/* every line will have the key and the value */
+/* key = value */
+/* mood : value to can be test or run */
+
+dp = taskwise_dev_dp
+dpuser = taskwise_admin_app_dev
+dpuserpass = taskwise_admin_app_pass
+host = localhost
+mood = test
