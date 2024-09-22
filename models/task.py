@@ -14,15 +14,15 @@ from models.engine.Errorevent import ERROR_EVENT
 class Task(BaseModel, Base):
     """Task class inherits from BaseModel and Base"""
     __tablename__ = 'tasks'
-    title = Column(String(128),nullable=False, unique=False)
-    description = Column(String(1024), nullable=True)
-
+    title = Column(String(128),nullable=False)
+    description = Column(String(1024))
+    type = Column(String(50), nullable=False,default='timed')  # This will store 'task', 'daily', 'timed', etc.
     # Status : True for valid 
     status = Column(Boolean, default=True, nullable=False)
     completed = Column(Boolean, default=False, nullable=False)
 
     # relationship
-    category_id = Column(String(60), ForeignKey('category_task.id'), nullable=False)
+    category_id = Column(String(60), ForeignKey('category_tasks.id'), nullable=False)
     notification_time = Column(DateTime, nullable=True)
 
     __mapper_args__ = {
@@ -53,8 +53,8 @@ class Dailytasks(Task):
         # Add validation logic here (e.g., checking for required arguments)
         if 'daily_time' not in kwargs:
             return ERROR_EVENT(maasage=" start_time is required for TimedTask ", code='6.1.1', typeevent='Usererror')
-        if kwargs['title']: # insure the uniqeness of the title
-            check  = dp_incetnace.get_data('Task', f'title={kwargs['title']}')
+        if kwargs['title'] or kwargs['title'] == '': # insure the uniqeness of the title
+            check  = dp_incetnace.get_data('Task', f'title={kwargs["title"]}')
             if len(check) > 0:
                 return  ERROR_EVENT(maasage=" Task with this title already exists ", code='6.1.4', typeevent='Usererror') 
         else:
@@ -97,7 +97,7 @@ class TimedTask(Task):
                return ERROR_EVENT(maasage=" End time must be after start time ", code='5.1.3', typeevent='Usererror')
     
         if kwargs['title']:
-            check  = dp_incetnace.get_data('Task', f'title={kwargs['title']}')
+            check  = dp_incetnace.get_data('Task', f'title={kwargs["title"]}')
             if len(check) > 0: # check if there is any task by the same titel
                 return ERROR_EVENT(maasage=" Task with this title already exists ", code='5.1.4', typeevent='Usererror') 
         else:
