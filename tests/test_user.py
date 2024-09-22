@@ -1,3 +1,12 @@
+""" 
+testing module for user
+create
+delete
+update
+
+"""
+
+
 import unittest
 from models.user import User
 from models.engine.dp_manager import DBStorage

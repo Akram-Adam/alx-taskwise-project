@@ -16,6 +16,7 @@ from models.user import User
 from models.category import Category_expencics, Category_tasks
 from models.expense import Expense
 from models.task import Task, TimedTask, Dailytasks
+from models.panel import Panel, UserPanel
 
 
 class DBStorage:
@@ -190,20 +191,42 @@ class DBStorage:
     
     def get_data(self, class_name, attrib):
         """
-        method to retuen instances by attribute
-        attrib : string  :: attribute=value
-        better use it with string type attributes
+        Method to return instances by attribute.
+        :param class_name: str  :: Name of the class to query
+        :param attrib: str  :: Attribute in the format attribute=value
+        :return: Instance that matches the attribute condition, or None if not found
         """
-        # under test 
-        classes = {'User': User, 'Category_expencics': Category_expencics,
-                   'Category_tasks': Category_tasks, 'Expense': Expense
-                   ,'Task': Task, TimedTask: TimedTask, 'Dailytasks': Dailytasks}
+        # Mapping of class names to class objects
+        classes = {
+            'User': User,
+            'Category_expencics': Category_expencics,
+            'Category_tasks': Category_tasks,
+            'Expense': Expense,
+            'Task': Task,
+            'TimedTask': TimedTask,
+            'Dailytasks': Dailytasks,
+            'Panel': Panel,
+            'UserPanel': UserPanel
+        }
 
         if class_name in classes:
             if attrib:
+                # Split the attribute into key and value
                 attribute_data = attrib.split('=')
-                if hasattr(classes[class_name], attribute_data[0]):
-                    query = f"self.__session.query({classes[class_name]}).
-                    filter({class_name}.{attribute_data[0]} == '{attribute_data[1]}').first()"
-                    objects = eval(query)
+                if len(attribute_data) != 2:
+                    raise ValueError("Attribute must be in the format 'attribute=value'")
+
+                attribute_name, attribute_value = attribute_data
+
+                # Ensure the class has the requested attribute
+                model_class = classes[class_name]
+                if hasattr(model_class, attribute_name):
+                    # Dynamically build the query
+                    objects = self.__session.query(model_class).filter(
+                        getattr(model_class, attribute_name) == attribute_value
+                    )
                     return objects
+                else:
+                    raise AttributeError(f"{class_name} has no attribute '{attribute_name}'")
+        else:
+            raise ValueError(f"Class '{class_name}' not found in available classes.")

@@ -29,7 +29,7 @@ class BaseModel:
 
     def __init__(self, *args, **kwargs):
         """ The constructor of the class expect: dict() of data """
-        print('um here in the base class')
+      
         if 'id' not in kwargs:
             self.id = str(uuid.uuid4())
         if 'created_at' not in kwargs:

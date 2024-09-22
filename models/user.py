@@ -3,6 +3,7 @@ import uuid
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, create_engine, ForeignKey\
     , Table, DateTime, Boolean
+from sqlalchemy.orm import relationship
 from sqlalchemy import CHAR, DateTime, func
 from models.extra.extrafile import is_list_part_of
 from models.base_model import BaseModel, Base
@@ -23,9 +24,14 @@ class User(BaseModel, Base):
     last_name = Column(String(128), nullable=True)
     Account_valid = Column(Boolean, nullable=False,default=False)
 
+    # the relationship between user and panle
+    panels = relationship('Panel', secondary='user_panels', back_populates='users')
+    user_panels = relationship('UserPanel', back_populates='user', overlaps="panels")
+
+
     def __init__(self, *args, **kwargs):
         """ calss constructor don't use it outside the class for security """
-        print('um here User Constructor')
+       
         self.__set_password(kwargs['user_password'])
         del  kwargs['user_password']
         super().__init__(*args, **kwargs)
@@ -49,18 +55,21 @@ class User(BaseModel, Base):
         # Check username
         # Check if the user already exist
     
-        if kwargs['email'] and kwargs['username']:
-            check = cls.__check_email_and_username(email=kwargs['email'], username=kwargs['username'])
-            if isinstance(check, ERROR_EVENT):
-                return check
+        if kwargs['email'] and not kwargs['email'] == '': 
+            if kwargs['username'] and not kwargs['username'] == '':
+                check = cls.__check_email_and_username(email=kwargs['email'], username=kwargs['username'])
+                if isinstance(check, ERROR_EVENT):
+                    return check
+            else:
+                return ERROR_EVENT(maasage=" 'username' data is missing ", code='1.0.0', typeevent='Usererror')
         else:
-            return ERROR_EVENT(maasage=" importand data is missing ", code='1.0.0', typeevent='Usererror')
+            return ERROR_EVENT(maasage=" 'email' data is missing ", code='1.0.1', typeevent='Usererror')
         if kwargs["user_password"] and kwargs["conformingpassword"]:
             check = cls.__check_password_validation(password=kwargs['user_password'], conformingpassword=kwargs['conformingpassword'])
             if isinstance(check, ERROR_EVENT):
                 return check
         else:
-            return ERROR_EVENT(maasage=" password or conforming password is missing ", code='1.0.1', typeevent='Usererror')
+            return ERROR_EVENT(maasage=" password or conforming password is missing ", code='1.0.2', typeevent='Usererror')
         if kwargs['conformingpassword']:
             del kwargs['conformingpassword']
             

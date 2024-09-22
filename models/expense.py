@@ -18,6 +18,9 @@ class Expense(BaseModel, Base):
     category: str
     description: str
     """
+
+    __tablename__ = 'expenses'
+    
     title = Column(String(128), nullable=False, unique=True)
     description = Column(String(1024))
     amount = Column(Float, nullable=False)
@@ -27,15 +30,16 @@ class Expense(BaseModel, Base):
     def __init__(self, *args, **kwargs):
         """ This is the constructor of the calss"""
         super().__init__(*args, **kwargs)
-        
+
+    @classmethod
     def create(cls, *args, **kwargs):
         """ Class to check if there is no missing data befor calling the Constructor """
         from models import dp_incetnace
         # Add validation logic here (e.g., checking for required arguments)
-        if kwargs['title']: # insure the uniqeness of the title
-            check  = dp_incetnace.get_data('Task', f'title={kwargs['title']}')
+        if kwargs['title'] or kwargs['title'] == '': # insure the uniqeness of the title
+            check  = dp_incetnace.get_data('Task', f'title={kwargs["title"]}')
 
-            if len(check) > 0:
+            if check.count() > 0:
                 return  ERROR_EVENT(maasage=" Task with this title already exists ", code='7.1.0', typeevent='Usererror') 
         else:
             return ERROR_EVENT(maasage=" 'titel' is missing ", code='7.1.1', typeevent='Usererror')
@@ -48,7 +52,12 @@ class Expense(BaseModel, Base):
         else:
             return ERROR_EVENT(maasage=" 'amount' is missing", code='7.1.3', typeevent='Usererror')
         
-        if not kwargs['category_id']:
+        if not kwargs['category_id'] or kwargs['category_id'] == '':
             return ERROR_EVENT(maasage=" 'category_id' is missing ", code='7.1.4', typeevent='Usererror')
+        else:
+            # check if the category exist
+            check = dp_incetnace.get_data('Category_expencics', f'id={kwargs["category_id"]}')
+            if check.count() == 0:
+                return ERROR_EVENT(maasage=" 'category_id' is not exist ", code='7.1.5', typeevent='Usererror')
         
         return cls(*args, **kwargs)
