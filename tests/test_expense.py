@@ -79,6 +79,13 @@ class TestExpense(unittest.TestCase):
             'panel_id': self.panel.id
         }
         self.category = Category_expencics.create(**(self.category_data))
+        
+        if isinstance(self.category, ERROR_EVENT):
+            print(self.category.ERROR_MASSAGE)
+            exit(1)
+        elif self.category is None:
+            print("UserPanel not created")
+    
     
         self.valid_data = {
             'title': 'Groceries',
@@ -121,6 +128,47 @@ class TestExpense(unittest.TestCase):
         self.assertIsInstance(error, ERROR_EVENT)
         self.assertEqual(error.ERROR_MASSAGE, " 'category_id' is missing ")
 
+    def test_delete_panel_and_related_data(self):
+        """Test deleting a panel and ensuring all related data is deleted"""
+        # Delete the panel
+        self.panel.delete()
+
+        # Check if the panel is deleted
+        deleted_panel = self.storage.get_data('Panel', f'id={self.panel.id}')
+        self.assertEqual(deleted_panel.count(), 0)
+
+        # Check if the category is deleted
+        deleted_category = self.storage.get_data('Category_expencics', f'id={self.category.id}')
+        self.assertEqual(deleted_category.count(), 0)
+
+        # Check if the expenses are deleted
+        deleted_expenses = self.storage.get_data('Expense', f'category_id={self.category.id}')
+        self.assertEqual(deleted_expenses.count(), 0)
+
+        # Check if the user is not deleted
+        existing_user = self.storage.get_data('User', f'id={self.user.id}')
+        self.assertEqual(existing_user.count(), 1)
+
+    def test_delete_category_and_related_expenses(self):
+        """Test deleting a category and ensuring all related expenses are deleted"""
+        # Delete the category
+        self.category.delete()
+
+        # Check if the category is deleted
+        deleted_category = self.storage.get_data('Category_expencics', f'id={self.category.id}')
+        self.assertEqual(deleted_category.count(), 0)
+
+        # Check if the expenses are deleted
+        deleted_expenses = self.storage.get_data('Expense', f'category_id={self.category.id}')
+        self.assertEqual(deleted_expenses.count(), 0)
+
+        # Check if the panel is not deleted
+        existing_panel = self.storage.get_data('Panel', f'id={self.panel.id}')
+        self.assertEqual(existing_panel.count(), 1)
+
+        # Check if the user is not deleted
+        existing_user = self.storage.get_data('User', f'id={self.user.id}')
+        self.assertEqual(existing_user.count(), 1)
 
 if __name__ == '__main__':
     unittest.main()

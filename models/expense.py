@@ -21,7 +21,7 @@ class Expense(BaseModel, Base):
 
     __tablename__ = 'expenses'
     
-    title = Column(String(128), nullable=False, unique=True)
+    title = Column(String(128), nullable=False)
     description = Column(String(1024))
     amount = Column(Float, nullable=False)
     category_id = Column(String(60), ForeignKey('category_expenses.id'), nullable=True)
@@ -36,23 +36,22 @@ class Expense(BaseModel, Base):
         """ Class to check if there is no missing data befor calling the Constructor """
         from models import dp_incetnace
         # Add validation logic here (e.g., checking for required arguments)
-        if kwargs['title'] or kwargs['title'] == '': # insure the uniqeness of the title
-            check  = dp_incetnace.get_data('Task', f'title={kwargs["title"]}')
+        if not kwargs['title'] or kwargs['title'] == '': # insure the uniqeness of the title
+            return ERROR_EVENT(maasage=" 'titel' is missing ", code='7.1.1', typeevent='Usererror')
 
             if check.count() > 0:
-                return  ERROR_EVENT(maasage=" Task with this title already exists ", code='7.1.0', typeevent='Usererror') 
-        else:
-            return ERROR_EVENT(maasage=" 'titel' is missing ", code='7.1.1', typeevent='Usererror')
+                return  ERROR_EVENT(maasage=" Task with this title already exists ", code='7.1.0', typeevent='Usererror')
         
         if kwargs['amount']: # insure the amoun in the data
-            if (kwargs['amount']).isdigit():
+            try:
                 kwargs['amount'] = float(kwargs['amount'])
-            else:
-                 return ERROR_EVENT(maasage=" 'amount' must be digit ", code='7.1.2', typeevent='Usererror')
+            except ValueError:
+                return ERROR_EVENT(maasage=" 'amount' must be digit ", code='7.1.2', typeevent='Usererror')
+        
         else:
             return ERROR_EVENT(maasage=" 'amount' is missing", code='7.1.3', typeevent='Usererror')
         
-        if not kwargs['category_id'] or kwargs['category_id'] == '':
+        if (not kwargs['category_id']) or kwargs['category_id'] == '':
             return ERROR_EVENT(maasage=" 'category_id' is missing ", code='7.1.4', typeevent='Usererror')
         else:
             # check if the category exist

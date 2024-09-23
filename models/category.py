@@ -53,7 +53,7 @@ class Category_tasks(BaseModel, Base):
 
     
         
-class Category_expencics(Base, BaseModel):
+class Category_expencics(BaseModel, Base):
     """ This class for category of expense """
     __tablename__ = 'category_expenses'
     name = Column(String(128), nullable=False)
@@ -66,7 +66,7 @@ class Category_expencics(Base, BaseModel):
     expenses = relationship('Expense', backref='Category_expenses', cascade='all, delete-orphan')
 
 
-    def __init__(*args, **kwargs):
+    def __init__(self, *args, **kwargs):
         """ This method for init the category """
         super().__init__(*args, **kwargs)
 
@@ -76,13 +76,6 @@ class Category_expencics(Base, BaseModel):
         if not kwargs['name'] or kwargs['name'] == '':
             """ Data missing """
             return ERROR_EVENT(maasage="Name feild is missing", code='4.1.0', typeevent='Usererror')
-        else:
-            # check if there is any Category by the name
-            from models import dp_incetnace
-            instance_ = dp_incetnace.get_data('Category_expenses', f'name={kwargs["name"]}')
-    
-            if  instance_.count() > 0:
-                 return ERROR_EVENT(maasage="Category already exist", code='4.1.2', typeevent='Usererror')
     
         if not kwargs['description']:
             return ERROR_EVENT(maasage="Description feild is missing", code='4.1.1', typeevent='Usererror')
