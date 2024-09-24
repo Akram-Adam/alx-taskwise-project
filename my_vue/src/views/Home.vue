@@ -250,7 +250,6 @@ section {
     text-align: center;
 }
 
-/* تنسيق قسم الـ info-section */
 .info-section {
     padding: 60px 20px;
     background: linear-gradient(to right, #ff6b6b, #f94d6a);

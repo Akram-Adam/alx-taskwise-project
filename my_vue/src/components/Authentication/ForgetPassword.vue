@@ -14,6 +14,7 @@
   </template>
   
   <script>
+  import Swal from 'sweetalert2'
   export default {
     name : 'ForgetPassword',
     data() {
@@ -25,7 +26,23 @@
       submitEmail() {
         // Logic for password reset email
         console.log('Password reset request sent to:', this.email);
+        this.successful('The email was sent successfully');
       },
+      successful(message, route = '/edit-password') {
+// Use SweetAlert to show the success message
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: message,
+        timer: 2000,  // The message is closed after 2 seconds
+        showConfirmButton: false
+      }).then(() => {
+        if (route) {
+// Navigate to a specific page after success
+          this.$router.push(route);
+        }
+      });
+    },
     },
   };
   </script>

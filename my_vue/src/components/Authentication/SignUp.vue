@@ -11,6 +11,10 @@
           <input type="text" v-model="username" required placeholder="Choose a username" />
         </div>
         <div class="input-group">
+          <label for="email">Enter your email</label>
+          <input type="email" v-model="email" required placeholder="Enter your email" />
+        </div>
+        <div class="input-group">
           <label for="password">Password</label>
           <input type="password" v-model="password" required placeholder="Enter your password" />
         </div>
@@ -24,7 +28,6 @@
             <option value="">Select Gender</option>
             <option value="male">Male</option>
             <option value="female">Female</option>
-            <option value="other">Other</option>
           </select>
         </div>
         <div class="input-group">
@@ -39,6 +42,7 @@
   </template>
   
   <script>
+  import Swal from 'sweetalert2';
   export default {
     name : 'sign-up',
 
@@ -46,6 +50,7 @@
       return {
         fullName: '',
         username: '',
+        email: '',
         password: '',
         confirmPassword: '',
         gender: '',
@@ -55,12 +60,36 @@
     methods: {
       signUp() {
         if (this.password !== this.confirmPassword) {
-          alert("Passwords don't match!");
+          this.error('Passwords do not match!');
           return;
         }
         // Logic for signing up
-        console.log('Sign Up:', this.fullName, this.username, this.gender, this.birthDate);
+        console.log('Sign Up:', this.fullName, this.username, this.email ,this.gender, this.birthDate);
+        this.successful('the account has been created successfully');
       },
+      successful(message, route = '/') {
+// Use SweetAlert to show the success message
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: message,
+        timer: 2000,  // The message is closed after 2 seconds
+        showConfirmButton: false
+      }).then(() => {
+        if (route) {
+// Navigate to a specific page after success
+          this.$router.push(route);
+        }
+      });
+    },
+    error(message) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: message,
+        showConfirmButton: true
+      });
+    },
     },
   };
   </script>

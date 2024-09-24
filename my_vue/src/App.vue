@@ -1,13 +1,14 @@
 <template>
   <div id="app">
     <nav class="navbar">
-      <div class="logo">TaskWise</div>
+      <div class="logo">TaskWise</div>        
       <ul class="nav-links">
         <li><router-link to="/">Home</router-link></li>
-        <li><router-link to="/profile">My Profile</router-link></li>
-        <li><router-link to="/tasks">My Tasks</router-link></li>
-        <li><router-link to="/expense-report">Expense Report</router-link></li>
+        <li><router-link to="/profile">Profile</router-link></li>
+        <li><router-link to="/tasks">Tasks</router-link></li>
+        <li><router-link to="/expense-report">Expense</router-link></li>
         <li><router-link to="/auth">Registration</router-link></li>
+        <li><router-link to="/about">About Us</router-link></li>
       </ul>
     </nav>
     <router-view />
@@ -33,7 +34,13 @@ methods: {
 </script>
 
 
-<style scoped lang="scss">
+<style lang="scss">
+body { 
+  font-family: "Inria Sans", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
 $primary-color: #2c3e50;
 $secondary-color: #3498db;
 $text-color: #ecf0f1;

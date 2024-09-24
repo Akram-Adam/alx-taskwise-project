@@ -24,21 +24,38 @@
 </template>
 
 <script>
-
+import Swal from 'sweetalert2';
 export default {
   name : 'AuthPage',
 
   data() {
     return {
-      email: '',
-      password: '',
+      email: 'akramadam050@gmail.com',
+      password: '123',
     };
   },
   methods: {
     login() {
       // Logic for login
       console.log('Login:', this.email, this.password);
+      this.successful('Login successful!');
     },
+    successful(message, route ='/') {
+// Use SweetAlert to show the success message
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: message,
+        timer: 2000,  // The message is closed after 2 seconds
+        showConfirmButton: false
+      }).then(() => {
+        if (route) {
+// Navigate to a specific page after success
+          this.$router.push(route);
+        }
+      });
+    }
+    
   },
 };
 </script>
