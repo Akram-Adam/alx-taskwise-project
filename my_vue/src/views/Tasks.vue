@@ -36,7 +36,7 @@
   
   <style scoped lang="scss">
   .my-tasks {
-    max-width: 800px;
+    max-width: 470px;
     margin: 0 auto;
     padding: 40px;
     background-color: #f4f6f9;

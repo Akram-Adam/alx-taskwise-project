@@ -46,6 +46,7 @@
   import LineChart from '../components/my_expense/LineChart.vue';
   import PieChart from '../components/my_expense/PieChart.vue';
   import { Chart, registerables } from 'chart.js';
+  import { useToast } from 'vue-toastification';
   
   Chart.register(...registerables);
   
@@ -59,7 +60,7 @@
     data() {
       return {
         newExpense: 0,
-        expenseDate: '',
+        expenseDate: new Date().toISOString().split('T')[0], // default to today's date
         expenses: [],
         weeklyData: [],
         monthlyData: [],
@@ -68,14 +69,25 @@
         currentSavingsGoal: 0,
       };
     },
+    setup() {
+    const toast = useToast(); // استخدام useToast من vue-toastification
+    return { toast };
+  },
     methods: {
       addExpense() {
         if (this.newExpense > 0 && this.expenseDate) {
           this.expenses.push({ amount: this.newExpense, date: this.expenseDate });
           this.updateCharts();
-          this.newExpense = 0;  // إعادة تعيين بعد الإدخال
+          this.newExpense =  0; // Reset after input
           this.expenseDate = '';
-        }
+          
+        
+//Display an alert message when the task is added successfully
+        this.toast.success('Task added successfully!');
+      } else {
+        this.toast.error('Please fill in all required fields.');// Alert when fields are not filled
+      }
+   
       },
       calculateTotal(period) {
         let total = 0;

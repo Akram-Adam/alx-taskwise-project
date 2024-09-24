@@ -1,80 +1,102 @@
 <template>
-    <div>
-      <h2>Task List</h2>
-      <select v-model="filterCategory">
-        <option value="">All Categories</option>
-        <option v-for="category in categories" :key="category">{{ category }}</option>
-      </select>
-      <ul>
-        <TaskItem
-          v-for="task in filteredTasks"
-          :key="task.id"
-          :task="task"
-          @remove-task="removeTask"
-          @edit-task="editTask"
-          @toggle-status="toggleStatus"
-        />
-      </ul>
-    </div>
-  </template>
-  
-  <script>
-  import TaskItem from './TaskItem.vue';
+  <div>
+    <h2>Task List</h2>
+    <!-- Category filter -->
+    <select v-model="filterCategory">
+      <option value="">All Categories</option>
+      <option v-for="category in categories" :key="category">{{ category }}</option>
+    </select>
+    
+    <!-- Type filter -->
+    <select v-model="filterType">
+      <option value="">All Types</option>
+      <option v-for="type in taskTypes" :key="type">{{ type }}</option>
+    </select>
+
+    <ul>
+      <TaskItem
+        v-for="task in filteredTasks"
+        :key="task.id"
+        :task="task"
+        @remove-task="removeTask"
+        @edit-task="editTask"
+        @toggle-status="toggleStatus"
+      />
+    </ul>
+  </div>
+</template>
+
 
   
-  export default {
-    components: {
-   TaskItem
+<script>
+import TaskItem from './TaskItem.vue';
+
+export default {
+  components: {
+    TaskItem,
   },
-    data() {
-      return {
-        tasks: [],
-        filterCategory: '',
-        categories: ['Work', 'Personal', 'Urgent'],
-      };
+  data() {
+    return {
+      tasks: [],
+      filterCategory: '', // Filter for category ('Work', 'Personal', etc.)
+      filterType: '',     // Filter for type ('daily', 'timed')
+      categories: ['Work', 'Personal', 'Urgent'], // Main categories
+      taskTypes: ['daily', 'timed'], // Task types within each category
+    };
+  },
+  computed: {
+    filteredTasks() {
+      return this.tasks.filter(task => {
+        const matchesCategory = this.filterCategory ? task.category === this.filterCategory : true;
+        const matchesType = this.filterType ? task.type === this.filterType : true;
+        return matchesCategory && matchesType;
+      });
     },
-    computed: {
-      filteredTasks() {
-        if (this.filterCategory) {
-          return this.tasks.filter(task => task.category === this.filterCategory);
-        }
-        return this.tasks;
-      },
+  },
+  methods: {
+    addTask(task) {
+      this.tasks.push(task);
     },
-    methods: {
-      addTask(task) {
-        this.tasks.push(task);
-      },
-      removeTask(taskId) {
-        this.tasks = this.tasks.filter(task => task.id !== taskId);
-      },
-      editTask(updatedTask) {
-        const index = this.tasks.findIndex(task => task.id === updatedTask.id);
-        if (index !== -1) {
-          this.$set(this.tasks, index, updatedTask);
-        }
-      },
-      toggleStatus(taskId) {
-        const task = this.tasks.find(task => task.id === taskId);
-        if (task) {
-          task.completed = !task.completed;
-        }
-      },
-      checkDeadlines() {
+    removeTask(taskId) {
+      this.tasks = this.tasks.filter(task => task.id !== taskId);
+    },
+    editTask(updatedTask) {
+      const index = this.tasks.findIndex(task => task.id === updatedTask.id);
+      if (index !== -1) {
+        this.$set(this.tasks, index, updatedTask);
+      }
+    },
+    toggleStatus(taskId) {
+      const task = this.tasks.find(task => task.id === taskId);
+      if (task) {
+        task.completed = !task.completed;
+      }
+    },
+    checkDeadlines() {
       this.tasks.forEach(task => {
-        if (!task.completed && task.time <= 5) {
-          alert(`Task "${task.name}" is due in ${task.time} minutes!`);
+        if (task.type === 'daily') {
+          if (!task.completed && task.time <= 1) {
+            alert(`Task "${task.name}" is due in ${task.time} hour(s)!`);
+          }
+        } else if (task.type === 'timed') {
+          const now = new Date();
+          const endDate = new Date(task.endDate);
+          if (!task.completed && endDate <= now) {
+            alert(`Task "${task.name}" is due today!`);
+          }
         }
       });
     },
-    },
-    mounted() {
-    setInterval(this.checkDeadlines, 60000); // التحقق من المواعيد النهائية كل دقيقة
   },
-  };
-  </script>
+  mounted() {
+    setInterval(this.checkDeadlines, 60000); // the check on time evray minutes
+  },
+};
+</script>
+
+
   
-  <style scoped lang="scss">
+<style scoped lang="scss">
 div {
   max-width: 600px;
   margin: 0 auto;
